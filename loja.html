@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loja de Veículos SAMP-MB | Mundo Brasileiro</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #001a4d 0%, #1a0033 50%, #330033 100%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            color: #fff;
+        }
+
+        /* Fundo com padrão */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(45deg, rgba(0, 255, 200, 0.05) 1px, transparent 1px),
+                linear-gradient(-45deg, rgba(255, 0, 200, 0.05) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        header {
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 20px 0;
+            border-bottom: 2px solid #00ffff;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            background: linear-gradient(45deg, #00ffff, #ff00ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+        }
+
+        .search-container {
+            flex: 1;
+            margin: 0 40px;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 20px;
+            border: 2px solid #00ffff;
+            background: rgba(0, 0, 0, 0.5);
+            color: #fff;
+            border-radius: 25px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.2);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #ff00ff;
+            box-shadow: 0 0 20px rgba(255, 0, 255, 0.5);
+            background: rgba(0, 0, 0, 0.8);
+        }
+
+        .search-input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 8px 16px;
+            background: rgba(0, 255, 255, 0.2);
+            border: 1px solid #00ffff;
+            color: #00ffff;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .filter-btn:hover,
+        .filter-btn.active {
+            background: #00ffff;
+            color: #000;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.6);
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .info-section {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .info-section h1 {
+            font-size: 36px;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #00ffff, #ff00ff, #00ffff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+        }
+
+        .info-section p {
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .results-info {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .veiculos-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .card {
+            background: rgba(0, 0, 0, 0.6);
+            border: 2px solid rgba(0, 255, 255, 0.3);
+            border-radius: 15px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            border-color: #ff00ff;
+            box-shadow: 0 10px 30px rgba(255, 0, 255, 0.4);
+            background: rgba(0, 0, 0, 0.8);
+        }
+
+        .card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            background: linear-gradient(45deg, rgba(0, 255, 200, 0.2), rgba(255, 0, 200, 0.2));
+        }
+
+        .card-content {
+            padding: 20px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card h3 {
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: #00ffff;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .card p {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 15px;
+            flex-grow: 1;
+        }
+
+        .price {
+            font-size: 20px;
+            font-weight: bold;
+            color: #00ff00;
+            margin-bottom: 15px;
+            text-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+        }
+
+        .botao-comprar {
+            display: inline-block;
+            padding: 12px 20px;
+            background: linear-gradient(45deg, #00ffff, #ff00ff);
+            color: #000;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+        }
+
+        .botao-comprar:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 25px rgba(255, 0, 255, 0.6);
+            background: linear-gradient(45deg, #ff00ff, #00ffff);
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 60px 20px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .no-results h2 {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: #ff00ff;
+        }
+
+        footer {
+            background: rgba(0, 0, 0, 0.9);
+            border-top: 2px solid #00ffff;
+            padding: 30px 20px;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.7);
+            margin-top: 40px;
+        }
+
+        footer p {
+            margin: 5px 0;
+        }
+
+        .footer-link {
+            color: #00ffff;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-link:hover {
+            color: #ff00ff;
+        }
+
+        /* Responsivo */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .search-container {
+                margin: 0;
+                width: 100%;
+            }
+
+            .filter-buttons {
+                justify-content: center;
+                width: 100%;
+            }
+
+            .veiculos-container {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+                gap: 15px;
+            }
+
+            .info-section h1 {
+                font-size: 24px;
+            }
+
+            .logo {
+                font-size: 20px;
+            }
+        }
+
+        /* Animação de carregamento */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card {
+            animation: fadeIn 0.5s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div class="logo">🚗 SAMP-MB Veículos</div>
+            <div class="search-container">
+                <input 
+                    type="text" 
+                    id="searchInput" 
+                    class="search-input" 
+                    placeholder="Procure por um veículo... (ex: Admiral, Infernus, Moto)"
+                >
+            </div>
+            <div class="filter-buttons">
+                <button class="filter-btn active" data-filter="todos">Todos</button>
+                <button class="filter-btn" data-filter="carros">Carros</button>
+                <button class="filter-btn" data-filter="motos">Motos</button>
+                <button class="filter-btn" data-filter="suv">SUV</button>
+                <button class="filter-btn" data-filter="avioes">Aviões</button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="info-section">
+            <h1>Loja de Veículos - Mundo Brasileiro</h1>
+            <p>Encontre o melhor veículo para sua jornada em SAMP</p>
+        </div>
+
+        <div class="results-info">
+            <span id="resultsCount">Carregando veículos...</span>
+        </div>
+
+        <div class="veiculos-container" id="veiculos-container">
+            <!-- Os veículos serão inseridos aqui -->
+        </div>
+
+        <div class="no-results" id="noResults" style="display: none;">
+            <h2>Nenhum veículo encontrado</h2>
+            <p>Tente buscar com outras palavras-chave</p>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Loja de Veículos SAMP-MB | Mundo Brasileiro</p>
+        <p>Todos os veículos por apenas <strong>$50.00</strong></p>
+        <p><a href="https://wa.me/5585994508145" class="footer-link">Contato via WhatsApp</a></p>
+    </footer>
+
+    <script>
+        // Dados dos veículos com os nomes corretos das imagens
+        const veiculos = [
+            { nome: "Admiral", preco: "$50.00", imagem: "Admiral.jpg", categoria: "carros" },
+            { nome: "Alpha", preco: "$50.00", imagem: "Alpha.jpg", categoria: "carros" },
+            { nome: "Banshee", preco: "$50.00", imagem: "Banshee.jpg", categoria: "carros" },
+            { nome: "Blista Compact", preco: "$50.00", imagem: "blista_compact.jpg", categoria: "carros" },
+            { nome: "Bravura", preco: "$50.00", imagem: "Bravura.jpg", categoria: "carros" },
+            { nome: "Broadway", preco: "$50.00", imagem: "Broadway.jpg", categoria: "carros" },
+            { nome: "Buccaneer", preco: "$50.00", imagem: "Buccaneer.jpg", categoria: "carros" },
+            { nome: "Buffalo", preco: "$50.00", imagem: "Buffalo.jpg", categoria: "carros" },
+            { nome: "Bullet", preco: "$50.00", imagem: "Bullet.jpg", categoria: "carros" },
+            { nome: "Cadrona", preco: "$50.00", imagem: "Cadrona.jpg", categoria: "carros" },
+            { nome: "Cheetah", preco: "$50.00", imagem: "Cheetah.jpg", categoria: "carros" },
+            { nome: "Clover", preco: "$50.00", imagem: "Clover.jpg", categoria: "carros" },
+            { nome: "Club", preco: "$50.00", imagem: "Club.jpg", categoria: "carros" },
+            { nome: "Comet", preco: "$50.00", imagem: "Comet.jpg", categoria: "carros" },
+            { nome: "Elegant", preco: "$50.00", imagem: "Elegant.jpg", categoria: "carros" },
+            { nome: "Elegy", preco: "$50.00", imagem: "Elegy.jpg", categoria: "carros" },
+            { nome: "Emperor", preco: "$50.00", imagem: "Emperor.jpg", categoria: "carros" },
+            { nome: "Esperanto", preco: "$50.00", imagem: "Esperanto.jpg", categoria: "carros" },
+            { nome: "Euros", preco: "$50.00", imagem: "Euros.jpg", categoria: "carros" },
+            { nome: "Flash", preco: "$50.00", imagem: "Flash.jpg", categoria: "carros" },
+            { nome: "Fortune", preco: "$50.00", imagem: "Fortune.jpg", categoria: "carros" },
+            { nome: "Glendale", preco: "$50.00", imagem: "Glendale.jpg", categoria: "carros" },
+            { nome: "Greenwood", preco: "$50.00", imagem: "Greenwood.jpg", categoria: "carros" },
+            { nome: "Hermes", preco: "$50.00", imagem: "Hermes.jpg", categoria: "carros" },
+            { nome: "Hotknife", preco: "$50.00", imagem: "Hotknife.jpg", categoria: "carros" },
+            { nome: "Hotring Racer", preco: "$50.00", imagem: "Hotring_Racer.jpg", categoria: "carros" },
+            { nome: "Hotring Racer A", preco: "$50.00", imagem: "Hotring_Racer_A.jpg", categoria: "carros" },
+            { nome: "Hotring Racer B", preco: "$50.00", imagem: "Hotring_Racer_B.jpg", categoria: "carros" },
+            { nome: "Hustler", preco: "$50.00", imagem: "Hustler.jpg", categoria: "carros" },
+            { nome: "Infernus", preco: "$50.00", imagem: "Infernus.jpg", categoria: "carros" },
+            { nome: "Intruder", preco: "$50.00", imagem: "Intruder.jpg", categoria: "carros" },
+            { nome: "Jester", preco: "$50.00", imagem: "Jester.jpg", categoria: "carros" },
+            { nome: "Landyalker", preco: "$50.00", imagem: "Landyalker.jpg", categoria: "carros" },
+            { nome: "Majestic", preco: "$50.00", imagem: "Majestic.jpg", categoria: "carros" },
+            { nome: "Manana", preco: "$50.00", imagem: "Manana.jpg", categoria: "carros" },
+            { nome: "Merit", preco: "$50.00", imagem: "Merit.jpg", categoria: "carros" },
+            { nome: "Mesa", preco: "$50.00", imagem: "Mesa.jpg", categoria: "carros" },
+            { nome: "Nebula", preco: "$50.00", imagem: "Nebula.jpg", categoria: "carros" },
+            { nome: "Oceanic", preco: "$50.00", imagem: "Oceanic.jpg", categoria: "carros" },
+            { nome: "Perennial", preco: "$50.00", imagem: "Perennial.jpg", categoria: "carros" },
+            { nome: "Phoenix", preco: "$50.00", imagem: "Phoenix.jpg", categoria: "carros" },
+            { nome: "Picador", preco: "$50.00", imagem: "Picador.jpg", categoria: "carros" },
+            { nome: "Premier", preco: "$50.00", imagem: "Premier.jpg", categoria: "carros" },
+            { nome: "Previon", preco: "$50.00", imagem: "Previon.jpg", categoria: "carros" },
+            { nome: "Primo", preco: "$50.00", imagem: "Primo.jpg", categoria: "carros" },
+            { nome: "Regina", preco: "$50.00", imagem: "Regina.jpg", categoria: "carros" },
+            { nome: "Remington", preco: "$50.00", imagem: "Remington.jpg", categoria: "carros" },
+            { nome: "Romero", preco: "$50.00", imagem: "Romero.jpg", categoria: "carros" },
+            { nome: "Sabre", preco: "$50.00", imagem: "Sabre.jpg", categoria: "carros" },
+            { nome: "Savanna", preco: "$50.00", imagem: "Savanna.jpg", categoria: "carros" },
+            { nome: "Sentinel", preco: "$50.00", imagem: "Sentinel.jpg", categoria: "carros" },
+            { nome: "Slamvan", preco: "$50.00", imagem: "Slamvan.jpg", categoria: "carros" },
+            { nome: "Solair", preco: "$50.00", imagem: "Solair.jpg", categoria: "carros" },
+            { nome: "Stafford", preco: "$50.00", imagem: "Stafford.jpg", categoria: "carros" },
+            { nome: "Stallion", preco: "$50.00", imagem: "Stallion.jpg", categoria: "carros" },
+            { nome: "Stratum", preco: "$50.00", imagem: "Stratum.jpg", categoria: "carros" },
+            { nome: "Stretch", preco: "$50.00", imagem: "Stretch.jpg", categoria: "carros" },
+            { nome: "Sultan", preco: "$50.00", imagem: "Sultan.jpg", categoria: "carros" },
+            { nome: "Sunrise", preco: "$50.00", imagem: "Sunrise.jpg", categoria: "carros" },
+            { nome: "Super GT", preco: "$50.00", imagem: "Super_GT.jpg", categoria: "carros" },
+            { nome: "Tahoma", preco: "$50.00", imagem: "Tahoma.jpg", categoria: "carros" },
+            { nome: "Tampa", preco: "$50.00", imagem: "Tampa.jpg", categoria: "carros" },
+            { nome: "Turismo", preco: "$50.00", imagem: "Turismo.jpg", categoria: "carros" },
+            { nome: "Vincent", preco: "$50.00", imagem: "Vincent.jpg", categoria: "carros" },
+            { nome: "Virgo", preco: "$50.00", imagem: "Virgo.jpg", categoria: "carros" },
+            { nome: "Voodoo", preco: "$50.00", imagem: "Voodoo.jpg", categoria: "carros" },
+            { nome: "Washington", preco: "$50.00", imagem: "Washington.jpg", categoria: "carros" },
+            { nome: "Willard", preco: "$50.00", imagem: "Willard.jpg", categoria: "carros" },
+            { nome: "Windsor", preco: "$50.00", imagem: "Windsor.jpg", categoria: "carros" },
+            { nome: "Zr-350", preco: "$50.00", imagem: "Zr_350.jpg", categoria: "carros" },
+            { nome: "Bobcat", preco: "$50.00", imagem: "Bobcat.jpg", categoria: "suv" },
+            { nome: "Huntley", preco: "$50.00", imagem: "Huntley.jpg", categoria: "suv" },
+            { nome: "Monster", preco: "$50.00", imagem: "Monster.jpg", categoria: "suv" },
+            { nome: "Monster A", preco: "$50.00", imagem: "Monster_A.jpg", categoria: "suv" },
+            { nome: "Monster B", preco: "$50.00", imagem: "Monster_B.jpg", categoria: "suv" },
+            { nome: "Patriot", preco: "$50.00", imagem: "Patriot.jpg", categoria: "suv" },
+            { nome: "Rancher", preco: "$50.00", imagem: "Rancher.jpg", categoria: "suv" },
+            { nome: "Rancher Lure", preco: "$50.00", imagem: "Rancher_Lure.jpg", categoria: "suv" },
+            { nome: "Sandking", preco: "$50.00", imagem: "Sandking.jpg", categoria: "suv" },
+            { nome: "Yosemite", preco: "$50.00", imagem: "Yosemite.jpg", categoria: "suv" },
+            { nome: "BF-400", preco: "$50.00", imagem: "BF_400.jpg", categoria: "motos" },
+            { nome: "Bike", preco: "$50.00", imagem: "Bike.jpg", categoria: "motos" },
+            { nome: "BMX", preco: "$50.00", imagem: "BMX.jpg", categoria: "motos" },
+            { nome: "Faggio", preco: "$50.00", imagem: "Faggio.jpg", categoria: "motos" },
+            { nome: "FCR-900", preco: "$50.00", imagem: "FCR_900.jpg", categoria: "motos" },
+            { nome: "Freeway", preco: "$50.00", imagem: "Freeway.jpg", categoria: "motos" },
+            { nome: "Mountain Bike", preco: "$50.00", imagem: "Mountain_Bike.jpg", categoria: "motos" },
+            { nome: "NRG-500", preco: "$50.00", imagem: "NRG_500.jpg", categoria: "motos" },
+            { nome: "PCJ-600", preco: "$50.00", imagem: "PCJ_600.jpg", categoria: "motos" },
+            { nome: "Pizzaboy", preco: "$50.00", imagem: "Pizzaboy.jpg", categoria: "motos" },
+            { nome: "Quad", preco: "$50.00", imagem: "Quad.jpg", categoria: "motos" },
+            { nome: "Sanchez", preco: "$50.00", imagem: "Sanchez.jpg", categoria: "motos" },
+            { nome: "Wayfarer", preco: "$50.00", imagem: "Wayfarer.jpg", categoria: "motos" },
+            { nome: "NRG-500", preco: "$50.00", imagem: "nrg_500.jpg", categoria: "motos" },
+            { nome: "Andromada", preco: "$50.00", imagem: "Andromada.jpg", categoria: "avioes" },
+            { nome: "AT-400", preco: "$50.00", imagem: "AT_400.jpg", categoria: "avioes" },
+            { nome: "Beagle", preco: "$50.00", imagem: "Beagle.jpg", categoria: "avioes" },
+            { nome: "Cargobob", preco: "$50.00", imagem: "Cargobob.jpg", categoria: "avioes" },
+            { nome: "Cropduster", preco: "$50.00", imagem: "Cropduster.jpg", categoria: "avioes" },
+            { nome: "Dodo", preco: "$50.00", imagem: "Dodo.jpg", categoria: "avioes" },
+            { nome: "Hunter", preco: "$50.00", imagem: "Hunter.jpg", categoria: "avioes" },
+            { nome: "Hydra", preco: "$50.00", imagem: "Hydra.jpg", categoria: "avioes" },
+            { nome: "Leviathan", preco: "$50.00", imagem: "Leviathan.jpg", categoria: "avioes" },
+            { nome: "Maverick", preco: "$50.00", imagem: "Maverick.jpg", categoria: "avioes" },
+            { nome: "Nevada", preco: "$50.00", imagem: "Nevada.jpg", categoria: "avioes" },
+            { nome: "Raindance", preco: "$50.00", imagem: "Raindance.jpg", categoria: "avioes" },
+            { nome: "Rustler", preco: "$50.00", imagem: "Rustler.jpg", categoria: "avioes" },
+            { nome: "Shamal", preco: "$50.00", imagem: "Shamal.jpg", categoria: "avioes" },
+            { nome: "Skimmer", preco: "$50.00", imagem: "Skimmer.jpg", categoria: "avioes" },
+            { nome: "Sparrow", preco: "$50.00", imagem: "Sparrow.jpg", categoria: "avioes" },
+            { nome: "Stuntplane", preco: "$50.00", imagem: "Stuntplane.jpg", categoria: "avioes" }
+        ];
+
+        let filtroAtual = 'todos';
+
+        // Renderizar veículos
+        function renderVeiculos(veiculosFiltrados = veiculos) {
+            const container = document.getElementById('veiculos-container');
+            const noResults = document.getElementById('noResults');
+            const resultsCount = document.getElementById('resultsCount');
+
+            container.innerHTML = '';
+
+            if (veiculosFiltrados.length === 0) {
+                noResults.style.display = 'block';
+                resultsCount.textContent = 'Nenhum veículo encontrado';
+                return;
+            }
+
+            noResults.style.display = 'none';
+            resultsCount.textContent = `${veiculosFiltrados.length} veículo(s) encontrado(s)`;
+
+            veiculosFiltrados.forEach(v => {
+                const card = document.createElement('div');
+                card.classList.add('card');
+                card.innerHTML = `
+                    <img src="${v.imagem}" alt="${v.nome}" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22250%22 height=%22200%22%3E%3Crect fill=%22%23333%22 width=%22250%22 height=%22200%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 font-size=%2220%22 fill=%22%23fff%22 text-anchor=%22middle%22 dominant-baseline=%22middle%22%3EImagem não encontrada%3C/text%3E%3C/svg%3E'" />
+                    <div class="card-content">
+                        <h3>${v.nome}</h3>
+                        <p class="price">${v.preco}</p>
+                        <a href="https://wa.me/5585994508145?text=Olá,%20quero%20comprar%20o%20veículo%20${v.nome}" target="_blank" class="botao-comprar">COMPRAR</a>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // Função de pesquisa
+        function pesquisarVeiculos() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            
+            let veiculosFiltrados = veiculos.filter(v => {
+                const nomeMatch = v.nome.toLowerCase().includes(searchTerm);
+                const categoriaMatch = filtroAtual === 'todos' || v.categoria === filtroAtual;
+                return nomeMatch && categoriaMatch;
+            });
+
+            renderVeiculos(veiculosFiltrados);
+        }
+
+        // Event listeners
+        document.getElementById('searchInput').addEventListener('input', pesquisarVeiculos);
+
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                filtroAtual = this.dataset.filter;
+                pesquisarVeiculos();
+            });
+        });
+
+        // Renderizar veículos ao carregar
+        renderVeiculos();
+    </script>
+</body>
+</html>
